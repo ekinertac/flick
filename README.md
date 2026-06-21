@@ -18,6 +18,67 @@ The menu bar shows one colored dot for aggregate status. Press your hotkey, the 
 - **No Accessibility permission** — hotkeys use Carbon's `RegisterEventHotKey`, which needs no permission and consumes the keystroke (no leak to the focused app)
 - **Zero dependencies** beyond the macOS SDK
 
+## What you can do with it
+
+flick toggles anything you can express as "check / start / stop" shell commands.
+A few recipes for `services[]` entries:
+
+**VPNs & tunnels**
+```jsonc
+// OpenVPN
+{ "id": "vpn", "name": "OpenVPN",
+  "status_command": "pgrep -x openvpn",
+  "connect_command": "sudo /opt/homebrew/sbin/openvpn --config /path/to/config.ovpn --daemon",
+  "disconnect_command": "sudo killall openvpn" }
+
+// WireGuard
+{ "id": "wg", "name": "WireGuard",
+  "status_command": "sudo wg show wg0 >/dev/null 2>&1",
+  "connect_command": "sudo wg-quick up wg0",
+  "disconnect_command": "sudo wg-quick down wg0" }
+
+// Tailscale
+{ "id": "ts", "name": "Tailscale",
+  "status_command": "tailscale status >/dev/null 2>&1",
+  "connect_command": "tailscale up",
+  "disconnect_command": "tailscale down" }
+
+// SOCKS proxy over SSH
+{ "id": "socks", "name": "SSH Proxy",
+  "status_command": "pgrep -f 'ssh -D 1080'",
+  "connect_command": "ssh -fND 1080 myserver",
+  "disconnect_command": "pkill -f 'ssh -D 1080'" }
+```
+
+**Local dev & infra**
+```jsonc
+// A docker-compose stack
+{ "id": "stack", "name": "Dev Stack",
+  "status_command": "docker compose -f ~/app/compose.yml ps -q | grep -q .",
+  "connect_command": "docker compose -f ~/app/compose.yml up -d",
+  "disconnect_command": "docker compose -f ~/app/compose.yml down" }
+
+// Local database
+{ "id": "pg", "name": "Postgres",
+  "status_command": "pg_isready -q",
+  "connect_command": "brew services start postgresql@16",
+  "disconnect_command": "brew services stop postgresql@16" }
+```
+
+**System toggles**
+```jsonc
+// Caffeinate (keep the Mac awake)
+{ "id": "wake", "name": "Stay Awake",
+  "status_command": "pgrep -x caffeinate",
+  "connect_command": "caffeinate -dimsu &",
+  "disconnect_command": "pkill -x caffeinate" }
+```
+
+Each service gets its own dot in the menu and an optional global hotkey, and the
+menu bar dot turns green only when everything you've configured is up. If a
+recipe needs `sudo` without a password prompt, add the matching sudoers entry
+(see below).
+
 ## Requirements
 
 - macOS 14.0+ (Swift toolchain ships with the Xcode Command Line Tools: `xcode-select --install`)
