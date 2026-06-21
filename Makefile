@@ -15,20 +15,21 @@ CLI_EXECUTABLE = $(BUILD_DIR)/$(CLI_NAME)
 CONTENTS_DIR = $(APP_BUNDLE)/Contents
 INSTALL_PATH = /usr/local/bin
 
-.PHONY: build run cli clean install sign help
+.PHONY: build run cli icon clean install sign help
 
 help:
 	@echo "flick - Build targets:"
 	@echo "  make build    - Build the app and CLI"
 	@echo "  make run      - Build and run the app"
 	@echo "  make cli      - Build the CLI and print its path"
+	@echo "  make icon     - Regenerate Flick.icns from icon.png"
 	@echo "  make install  - Build and install to /Applications and /usr/local/bin"
 	@echo "  make clean    - Remove build artifacts"
 
 build: $(EXECUTABLE) $(CLI_EXECUTABLE)
 	@echo "✓ Built $(APP_BUNDLE) and $(CLI_EXECUTABLE)"
 
-$(EXECUTABLE): $(SWIFT_FILES) Info.plist
+$(EXECUTABLE): $(SWIFT_FILES) Info.plist Flick.icns
 	@mkdir -p $(CONTENTS_DIR)/MacOS
 	@mkdir -p $(CONTENTS_DIR)/Resources
 	@echo "Compiling app..."
@@ -39,6 +40,8 @@ $(EXECUTABLE): $(SWIFT_FILES) Info.plist
 	@chmod +x $(EXECUTABLE)
 	@echo "Copying Info.plist..."
 	@cp Info.plist $(CONTENTS_DIR)/Info.plist
+	@echo "Installing app icon..."
+	@cp Flick.icns $(CONTENTS_DIR)/Resources/Flick.icns
 	@echo "Creating PkgInfo..."
 	@echo -n "APPL????" > $(CONTENTS_DIR)/PkgInfo
 	@echo "Code signing app..."
@@ -56,6 +59,26 @@ run: build
 cli: $(CLI_EXECUTABLE)
 	@echo "CLI built. Run it without installing:"
 	@echo "  $(abspath $(CLI_EXECUTABLE)) <service_id> [status|toggle]"
+
+# Regenerate the .icns from icon.png (1024x1024 source). Committed to the repo
+# so normal builds just copy it and don't depend on iconutil being available.
+icon: icon.png
+	@echo "Generating Flick.icns from icon.png..."
+	@rm -rf $(BUILD_DIR)/Flick.iconset
+	@mkdir -p $(BUILD_DIR)/Flick.iconset
+	@sips -z 1024 1024 icon.png --out $(BUILD_DIR)/base.png >/dev/null
+	@sips -z 16 16     $(BUILD_DIR)/base.png --out $(BUILD_DIR)/Flick.iconset/icon_16x16.png >/dev/null
+	@sips -z 32 32     $(BUILD_DIR)/base.png --out $(BUILD_DIR)/Flick.iconset/icon_16x16@2x.png >/dev/null
+	@sips -z 32 32     $(BUILD_DIR)/base.png --out $(BUILD_DIR)/Flick.iconset/icon_32x32.png >/dev/null
+	@sips -z 64 64     $(BUILD_DIR)/base.png --out $(BUILD_DIR)/Flick.iconset/icon_32x32@2x.png >/dev/null
+	@sips -z 128 128   $(BUILD_DIR)/base.png --out $(BUILD_DIR)/Flick.iconset/icon_128x128.png >/dev/null
+	@sips -z 256 256   $(BUILD_DIR)/base.png --out $(BUILD_DIR)/Flick.iconset/icon_128x128@2x.png >/dev/null
+	@sips -z 256 256   $(BUILD_DIR)/base.png --out $(BUILD_DIR)/Flick.iconset/icon_256x256.png >/dev/null
+	@sips -z 512 512   $(BUILD_DIR)/base.png --out $(BUILD_DIR)/Flick.iconset/icon_256x256@2x.png >/dev/null
+	@sips -z 512 512   $(BUILD_DIR)/base.png --out $(BUILD_DIR)/Flick.iconset/icon_512x512.png >/dev/null
+	@sips -z 1024 1024 $(BUILD_DIR)/base.png --out $(BUILD_DIR)/Flick.iconset/icon_512x512@2x.png >/dev/null
+	@iconutil -c icns $(BUILD_DIR)/Flick.iconset -o Flick.icns
+	@echo "✓ Wrote Flick.icns"
 
 install: build
 	@echo "Installing app to /Applications..."
