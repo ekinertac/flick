@@ -1,9 +1,12 @@
 // Service state tracking and management.
+//
+// Plain class on purpose: the UI is pure AppKit and refreshes on a Timer poll
+// (see AppDelegate), so nothing observes this via SwiftUI. Avoiding the
+// @Observable macro also keeps the build working under the Command Line Tools
+// Swift toolchain (which Homebrew uses), where the macro can fail to expand.
 
 import Foundation
-import Observation
 
-@Observable
 final class ServicesModel {
     private(set) var services: [ServiceState] = []
     private(set) var config: AppConfig?
