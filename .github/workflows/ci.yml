@@ -1,0 +1,24 @@
+# CI: build the flick menu bar app + CLI from source on macOS.
+#
+# Source-build is also how end users install via Homebrew
+# (`brew install ekinertac/tap/flick` compiles locally), so a green build here
+# means the Homebrew formula will compile cleanly on users' machines too.
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build app + CLI
+        run: make build
+
+      - name: CLI smoke test
+        # No args = create default config and list services; exits 0.
+        run: .build/flick
