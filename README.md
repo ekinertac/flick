@@ -1,5 +1,7 @@
 # flick
 
+[![CI](https://github.com/ekinertac/flick/actions/workflows/ci.yml/badge.svg)](https://github.com/ekinertac/flick/actions/workflows/ci.yml)
+
 A tiny macOS menu bar app + CLI for toggling services (VPN, Tailscale, anything with a connect/disconnect command) from a global hotkey or a single click.
 
 The menu bar shows one colored dot for aggregate status. Press your hotkey, the service flips. That's it.
@@ -88,7 +90,26 @@ recipe needs `sudo` without a password prompt, add the matching sudoers entry
   <your-username> ALL=(ALL) NOPASSWD: /opt/homebrew/sbin/openvpn, /usr/bin/killall openvpn
   ```
 
-## Build & Install
+## Install
+
+### Homebrew (recommended)
+
+```bash
+brew install ekinertac/tap/flick
+```
+
+This builds from source on your machine, so there's no Gatekeeper /
+notarization prompt. It installs the `flick` CLI and a `Flick.app` bundle; to
+use the menu bar app, copy it to `/Applications` (Homebrew prints the exact
+path in its caveat):
+
+```bash
+cp -r "$(brew --prefix flick)/Flick.app" /Applications/
+```
+
+Then add it under System Settings → General → Login Items.
+
+### From source
 
 ```bash
 make build      # Compile the app and CLI into .build/
@@ -97,8 +118,6 @@ make cli        # Build just the CLI and print its path
 make install    # Copy the app to /Applications and `flick` to /usr/local/bin
 make clean      # Remove build artifacts
 ```
-
-To launch the app at login: System Settings → General → Login Items → add `Flick.app`.
 
 ## Configuration
 
