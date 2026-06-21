@@ -1,0 +1,24 @@
+{
+  "menu_hotkey_key": "space",
+  "menu_hotkey_modifiers": ["cmd", "opt"],
+  "services": [
+    {
+      "id": "openvpn",
+      "name": "OpenVPN",
+      "status_command": "pgrep -x openvpn",
+      "connect_command": "sudo /opt/homebrew/sbin/openvpn --config /path/to/your/config.ovpn --daemon",
+      "disconnect_command": "sudo killall openvpn",
+      "hotkey_key": "v",
+      "hotkey_modifiers": ["cmd", "opt"]
+    },
+    {
+      "id": "tailscale",
+      "name": "Tailscale",
+      "status_command": "tailscale status >/dev/null 2>&1",
+      "connect_command": "tailscale up",
+      "disconnect_command": "tailscale down",
+      "hotkey_key": "t",
+      "hotkey_modifiers": ["cmd", "opt"]
+    }
+  ]
+}

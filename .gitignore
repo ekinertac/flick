@@ -1,0 +1,10 @@
+# Build output
+.build/
+
+# macOS
+.DS_Store
+
+# Local runtime files (created in ~/.config at runtime, but ignore if copied here)
+flick.json
+flick.log
+*.ovpn
