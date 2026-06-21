@@ -107,7 +107,20 @@ path in its caveat):
 cp -r "$(brew --prefix flick)/Flick.app" /Applications/
 ```
 
-Then add it under System Settings → General → Login Items.
+### Start at login
+
+Either add `Flick.app` under System Settings → General → Login Items, or from
+the terminal:
+
+```bash
+osascript -e 'tell application "System Events" to make login item at end with properties {path:"/Applications/Flick.app", hidden:false, name:"Flick"}'
+```
+
+(The first run may ask to allow controlling System Events.) To remove it later:
+
+```bash
+osascript -e 'tell application "System Events" to delete login item "Flick"'
+```
 
 ### From source
 
