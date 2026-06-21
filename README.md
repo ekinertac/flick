@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="icon.png" alt="flick" width="180">
+</p>
+
 # flick
 
 [![CI](https://github.com/ekinertac/flick/actions/workflows/ci.yml/badge.svg)](https://github.com/ekinertac/flick/actions/workflows/ci.yml)
